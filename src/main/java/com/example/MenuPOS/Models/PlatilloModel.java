@@ -16,6 +16,14 @@ public class PlatilloModel {
     @Column(name = "imagen", columnDefinition="MEDIUMBLOB")
     private byte[] imagen;
 
+    public PlatilloModel(String nombre, String descripcion, double precio, byte[] imagenBytes) {
+
+    }
+
+    public PlatilloModel() {
+
+    }
+
     public Long getId() {
         return id;
     }

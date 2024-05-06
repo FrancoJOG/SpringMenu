@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/css/index.css">
+    <title>Menu Platillos</title>
+</head>
+<style>
+    .body{
+        background-color: #ffd5b9;
+        padding: 0;
+        margin: 0;
+        border: 0;
+    }
+    .highlighted-row {
+        background-color: rgba(255, 255, 0, 0.2); /* Color de fondo amarillo tenue */
+    }
+
+    /* Estilo para filas ocultas */
+    .hidden-row {
+        display: none;
+    }
+</style>
+<body class="body">
+<header class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/menu">Menu</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/platillos">Platillos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/bebidas">Bebidas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/registrar">Registrar</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<h2>Platillos del Menú</h2>
+<form class="container mt-4">
+    <div class="mb-3 mt-3">
+        <label for="platilloNombre" class="form-label">Nombre:</label>
+        <input type="text" class="form-control" id="platilloNombre" placeholder="Buscar por nombre" name="platilloNombre">
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="platilloDescripcion" class="form-label">Descripción:</label>
+        <input type="text" class="form-control" id="platilloDescripcion" placeholder="Buscar por descripción" name="platilloDescripcion">
+    </div>
+    <button type="button" class="btn btn-primary" onclick="buscarPlatillo('platilloNombre')">Buscar por Nombre</button>
+    <button type="button" class="btn btn-primary" onclick="buscarPlatillo('platilloDescripcion')">Buscar por Descripción</button>
+    <button type="button" class="btn btn-primary" onclick="limpiarFiltros()">Limpiar filtros</button>
+</form>
+
+<div class="container mt-4">
+    <table id="platillosTable" class="table table-dark table-striped">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Opciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Table body will be populated dynamically with Thymeleaf -->
+        <tr th:each="platillo : ${platillos}">
+            <td th:text="${platillo.id}"></td>
+            <td th:text="${platillo.nombre}"></td>
+            <td th:text="${platillo.descripcion}"></td>
+            <td th:text="|$${{platillo.precio}}"|></td>
+            <td>
+                <button type="button" class="btn btn-danger" onclick="deletePlatillo(this)" th:data-id="${platillo.id}" >Eliminar</button>
+                <button type="button" class="btn btn-warning"  onclick="editPlatillo(this)" th:data-id="${platillo.id}" >Editar </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    //Eliminar
+    function deletePlatillo(button) {
+        var platilloId = button.getAttribute('data-id');
+
+        if (confirm("¿Estás seguro de eliminar este platillo?")) {
+            // Hacer una solicitud para eliminar el platillo con el ID platilloId
+            fetch(`/eliminar-platillo/${platilloId}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('No se pudo eliminar el platillo');
+                    }
+                    // No necesitamos manejar la respuesta si no hay contenido JSON esperado
+                    if (response.status === 204 || response.status === 200)  {
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al eliminar el platillo:', error);
+                });
+        }
+    }
+
+    //Solo hace un get
+    function editPlatillo(button) {
+        var platilloId = button.getAttribute('data-id');
+
+        // Obtener los detalles del platillo seleccionado para editar
+        fetch(`/dishes/find-by?id=${platilloId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('No se pudo obtener el platillo para editar');
+                }
+                return response.json();
+            })
+            .then(platillo => {
+                // Rellenar el formulario con los detalles del platillo
+                document.getElementById('editarPlatilloId').value = platillo.id;
+                document.getElementById('editarPlatilloNombre').value = platillo.nombre;
+                document.getElementById('editarPlatilloDescripcion').value = platillo.descripcion;
+                document.getElementById('editarPlatilloPrecio').value = platillo.precio;
+
+                // Mostrar el formulario de edición
+                document.getElementById('editarPlatilloForm').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error al obtener el platillo para editar:', platilloId , error);
+            });
+    }
+    //Consecutivamente guarda cambios
+    function guardarCambiosPlatillo() {
+        var editarPlatilloId = document.getElementById('editarPlatilloId').value;
+        var editarPlatilloNombre = document.getElementById('editarPlatilloNombre').value;
+        var editarPlatilloDescripcion = document.getElementById('editarPlatilloDescripcion').value;
+        var editarPlatilloPrecio = document.getElementById('editarPlatilloPrecio').value;
+
+        var platilloData = {
+            id: editarPlatilloId,
+            nombre: editarPlatilloNombre,
+            descripcion: editarPlatilloDescripcion,
+            precio: editarPlatilloPrecio
+        };
+
+        // Hacer una solicitud para guardar los cambios del platillo
+        fetch(`/dishes`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(platilloData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('No se pudo guardar los cambios del platillo ${response.status}' );
+                }
+                return response.json();
+                location.reload()
+                          })
+            .then(menuAPI => {
+                console.log('Success:', menuAPI);
+                populateTableFromJSON(url);
+
+            })
+            .catch(error => {
+                console.error('Error al guardar los cambios del platillo:', error);
+            });
+    }
+
+    function findPlatillo(id,findPath){
+        cleanTableRows();
+        populateTableFromJSON(url+findPath+document.getElementById(id).value);
+    }
+    function buscarPlatillo(campo) {
+        var filtro = document.getElementById(campo).value.trim().toLowerCase();
+
+        // Obtener todas las filas de la tabla
+        var filas = document.getElementById('platillosTable').getElementsByTagName('tr');
+
+        // Iterar sobre las filas y ocultar aquellas que no cumplan con el filtro
+        for (var i = 0; i < filas.length; i++) {
+            var fila = filas[i];
+            var texto = fila.getElementsByTagName('td')[campo === 'platilloNombre' ? 1 : 2].textContent.toLowerCase();
+
+            // Mostrar u ocultar la fila según si coincide con el filtro
+            if (campo === 'platilloNombre' && texto.includes(filtro)) {
+                fila.classList.add('highlighted-row'); // Resaltar la fila
+                fila.classList.remove('hidden-row'); // Asegurarse de que la fila esté visible
+            } else if (campo === 'platilloDescripcion' && texto.includes(filtro)) {
+                fila.classList.add('highlighted-row'); // Resaltar la fila
+                fila.classList.remove('hidden-row'); // Asegurarse de que la fila esté visible
+            } else {
+                fila.classList.remove('highlighted-row'); // Deshacer el resaltado de la fila
+                fila.classList.add('hidden-row'); // Ocultar la fila
+            }
+        }
+    }
+
+    // Función para limpiar los filtros y mostrar todas las filas de la tabla
+    function limpiarFiltros() {
+        // Obtener todas las filas de la tabla
+        var filas = document.getElementById('platillosTable').getElementsByTagName('tr');
+
+        // Iterar sobre las filas y mostrarlas todas
+        for (var i = 0; i < filas.length; i++) {
+            var fila = filas[i];
+            fila.style.display = '';
+        }
+
+        // Limpiar los campos de búsqueda
+        document.getElementById('platilloNombre').value = '';
+        document.getElementById('platilloDescripcion').value = '';
+    }
+</script>
+
+<div id="editarPlatilloForm" style="display: none;"  class="container mt-4">
+    <h3>Editar Platillo</h3>
+    <form>
+        <input type="hidden" id="editarPlatilloId">
+        <div class="mb-3 mt-3">
+            <label for="editarPlatilloNombre" class="form-label">Nombre:</label>
+            <input type="text" class="form-control" id="editarPlatilloNombre" name="editarPlatilloNombre">
+        </div>
+        <div class="mb-3 mt-3">
+            <label for="editarPlatilloDescripcion" class="form-label">Descripción:</label>
+            <input type="text" class="form-control" id="editarPlatilloDescripcion" name="editarPlatilloDescripcion">
+        </div>
+        <div class="mb-3 mt-3">
+            <label for="editarPlatilloPrecio" class="form-label">Precio:</label>
+            <input type="number" class="form-control" id="editarPlatilloPrecio" name="editarPlatilloPrecio">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="guardarCambiosPlatillo()">Guardar Cambios</button>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>

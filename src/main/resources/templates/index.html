@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/css/index.css">
+    <title>Menu Principal</title>
+</head>
+<style>
+    .body{
+        background-color: #ffd5b9;
+        padding: 0;
+        margin: 0;
+        border: 0;
+    }
+</style>
+<body class="body">
+<header class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/menu">Menu</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/platillos">Platillos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/bebidas">Bebidas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/registrar">Registrar</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+
+<h1>Platillos</h1><hr>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 mb-4" th:each="platillo : ${platillos}">
+            <div class="card">
+                <img th:src="@{'/imagen/' + ${platillo.id}}" class="card-img-top" alt="Imagen del platillo">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${platillo.nombre}"></h5>
+                    <p class="card-text" th:text="${platillo.descripcion}"></p>
+                    <p class="card-text" th:text="|$${platillo.precio}"|></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h1>Bebidas</h1><hr>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>

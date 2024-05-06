@@ -23,6 +23,8 @@ public class PlatilloService {
         return platilloRepository.save(platillo);
     }
 
+
+
     public ArrayList<PlatilloModel> findByNombre(String nombre){
         return (ArrayList<PlatilloModel>) platilloRepository.findByNombre(nombre); //casteo
     }
@@ -33,5 +35,30 @@ public class PlatilloService {
 
     public ArrayList<PlatilloModel> findByPrecio(double precio){
         return (ArrayList<PlatilloModel>) platilloRepository.findByPrecio(precio); //casteo
+    }
+
+    public Optional<PlatilloModel> findById(long id){
+        return platilloRepository.findById(id); //casteo
+    }
+
+    //test
+    public byte[] obtenerImagen(Long platilloId) {
+        Optional<PlatilloModel> optionalPlatillo = platilloRepository.findById(platilloId);
+        if (optionalPlatillo.isPresent()) {
+            PlatilloModel platillo = optionalPlatillo.get();
+            return platillo.getImagen(); // Suponiendo que el modelo PlatilloModel tiene un atributo "imagen" que es un array de bytes
+        } else {
+            // Manejar el caso en el que el platillo no sea encontrado
+            return null;
+        }
+    }
+
+    public void deletePlatillo(Long platilloId) {
+        platilloRepository.deleteById(platilloId);
+    }
+
+    public PlatilloModel findById(Long id) {
+        Optional<PlatilloModel> platilloOptional = platilloRepository.findById(id);
+        return platilloOptional.orElse(null);
     }
 }
