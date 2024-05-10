@@ -1,44 +1,32 @@
 package com.example.MenuPOS.Models;
 
+
 import jakarta.persistence.*;
 
-@Entity //mapear jpa
-@Table(name="platillos") //inidcar la tabla
-public class PlatilloModel {
+import java.io.Serial;
+import java.io.Serializable;
+
+@Entity
+@Table(name="bebidas")
+public class BebidaModel implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
     private Long id;
     private String nombre;
     private String descripcion;
-    private double precio;
-    @Lob // Binaria large object
-    @Column(name = "imagen", columnDefinition="MEDIUMBLOB")
-    private byte[] imagen;
+    private String imagen;
 
-    public String getImage() {
-        return image;
+    public String getImagen() {
+        return imagen;
     }
 
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    private String image;
-
-    public PlatilloModel(String nombre, String descripcion, double precio, String image) {
-
-    }
-
-    public PlatilloModel(String nombre, String descripcion, double precio) {
-
-    }
-    public PlatilloModel(String nombre, String descripcion, double precio, byte[] imagenBytes) {
-
-    }
-
-    public PlatilloModel() {
-
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 
     public Long getId() {
@@ -73,13 +61,15 @@ public class PlatilloModel {
         this.precio = precio;
     }
 
-    public byte[] getImagen() {
-        return imagen;
+    private double precio;
+
+    @Override
+    public String toString() {
+        return "BebidaModel{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                ", precio=" + precio +
+                '}';
     }
-
-    public void setImagen(byte[] imagen) {
-        this.imagen = imagen;
-    }
-
-
 }

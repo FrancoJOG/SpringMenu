@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="Template :: head">
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <header th:replace="Template :: header"></header>
+
+<!--- Content -->
+    <div class="container">
+        <div class="card p-4 m-2 " style="background-color: rgba(255,255,255,0.5);">
+            <div class="card-header bg-dark text-white" th:text="${titulo}"> </div>
+            <div class="card-body" >
+                <img class="img-thumbnail rounded float-left"
+                     th:src="@{'/img/' + ${bebidas.imagen}}"
+                     th:alt="${bebidas.imagen}"
+                     style="max-width: 25%;">
+                    <ul class="list-group">
+                        <li class="list-group-item" th:text="'Nombre del producto: ' +${bebidas.nombre}"></li>
+                        <li class="list-group-item" th:text="'Descripcion del producto: ' +${bebidas.descripcion}"></li>
+                        <li class="list-group-item" th:text="'Precio del producto: ' +${bebidas.precio}"></li>
+                    </ul>
+            </div>
+        </div>
+    </div>
+<!-- End Content -->
+
+    <footer th:replace="Template :: footer"> no importa </footer>
+</body>
+</html>

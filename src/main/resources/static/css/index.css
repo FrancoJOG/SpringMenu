@@ -1,0 +1,15 @@
+body{
+    background-color: #ffd5b9;
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+.highlighted-row {
+    background-color: rgba(255, 255, 0, 0.2); /* Color de fondo amarillo tenue */
+}
+
+/* Estilo para filas ocultas */
+.hidden-row {
+    display: none;
+}
